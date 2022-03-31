@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using PetShop.Web.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using PetShopWeb.Models;
+using System.Diagnostics;
 
-namespace PetShop.Web.Controllers
+namespace PetShopWeb.Controllers
 {
     public class HomeController : Controller
     {
