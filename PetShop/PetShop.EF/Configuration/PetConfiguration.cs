@@ -20,6 +20,7 @@ namespace PetShop.EF.Configuration
             builder.Property(pet => pet.PetStatus).HasConversion(petStatus => petStatus.ToString(), petStatus => (PetStatus)Enum.Parse(typeof(PetStatus), petStatus)).HasMaxLength(15);
             builder.Property(pet => pet.Price).HasPrecision(10, 3);
             builder.Property(pet => pet.Cost).HasPrecision(10, 3);
+           
 
             builder.HasOne(pet => pet.Transaction)
                 .WithOne(transaction => transaction.Pet)

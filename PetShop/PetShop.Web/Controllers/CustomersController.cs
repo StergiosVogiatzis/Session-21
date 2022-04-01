@@ -7,23 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
 {
     public class CustomersController : Controller
     {
         private readonly PetShopContext _context;
+        private readonly IEntityRepo<Customer> _customerRepo;  
 
-        public CustomersController(PetShopContext context)
+        public CustomersController(IEntityRepo<Customer> customerRepo)
         {
-            _context = context;
+            _customerRepo = customerRepo;
         }
 
         // GET: Customer
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customers.ToListAsync());
+            return View(await _customerRepo.GetAllAsync());
         }
 
         // GET: Customer/Details/5
@@ -34,14 +37,14 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var customer = await _customerRepo.GetByIdAsync(id.Value);
             if (customer == null)
             {
                 return NotFound();
             }
+            var viewModel = new CustomerViewModel { Name = customer.Name, Surname = customer.Surname, Phone = customer.Phone, TIN = customer.TIN };
 
-            return View(customer);
+            return View(viewModel);
         }
 
         // GET: Customer/Create
@@ -55,15 +58,15 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Surname,Phone,TIN,ID")] Customer customer)
+        public async Task<IActionResult> Create([Bind("Name,Surname,Phone,TIN")] CustomerCreateViewModel customerView)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
+                var customer = new Customer { Name = customerView.Name, Surname = customerView.Surname, Phone = customerView.Phone, TIN = customerView.TIN };
+                await _customerRepo.AddAsync(customer);
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+            return View(customerView);
         }
 
         // GET: Customer/Edit/5
@@ -74,12 +77,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _customerRepo.GetByIdAsync(id.Value);
             if (customer == null)
             {
                 return NotFound();
             }
-            return View(customer);
+            var customerView = new CustomerUpdateViewModel { Name = customer.Name, Surname = customer.Surname, TIN = customer.TIN, Phone = customer.Phone };
+            return View(customerView);
         }
 
         // POST: Customer/Edit/5
@@ -87,34 +91,27 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Surname,Phone,TIN,ID")] Customer customer)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Surname,Phone,TIN,ID")] CustomerUpdateViewModel customerView)
         {
-            if (id != customer.ID)
+            if (id != customerView.ID)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentCustomer = await _customerRepo.GetByIdAsync(id);
+                if (currentCustomer == null)
+                    return BadRequest("Could not find Customer");
+                currentCustomer.Name = customerView.Name;
+                currentCustomer.Surname = customerView.Surname;
+                currentCustomer.TIN = customerView.TIN;
+                currentCustomer.Phone = customerView.Phone;
+                await _customerRepo.UpdateAsync(id, currentCustomer);
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+
+            return View(customerView);
         }
 
         // GET: Customer/Delete/5
@@ -125,14 +122,14 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var customer = await _customerRepo.GetByIdAsync(id.Value);
+            
             if (customer == null)
             {
                 return NotFound();
             }
-
-            return View(customer);
+            var customerView = new CustomerDeleteViewModel { ID = customer.ID, Name = customer.Name, Surname = customer.Surname, Phone = customer.Phone, TIN = customer.TIN  };
+            return View(customerView);
         }
 
         // POST: Customer/Delete/5
@@ -140,9 +137,7 @@ namespace PetShop.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            await _customerRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

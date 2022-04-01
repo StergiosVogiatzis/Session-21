@@ -1,11 +1,13 @@
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
+using PetShop.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PetShopContext>();
-
+builder.Services.AddScoped<IEntityRepo<Customer>, CustomerRepo>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

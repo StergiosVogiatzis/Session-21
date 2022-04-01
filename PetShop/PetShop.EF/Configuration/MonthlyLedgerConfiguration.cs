@@ -15,7 +15,7 @@ namespace PetShop.EF.Configuration
         {
 
             builder.ToTable("MonthlyLedgers");
-            builder.HasKey(monthlyLedger => new {monthlyLedger.Year, monthlyLedger.Month});
+            builder.HasKey(monthlyLedger => monthlyLedger.ID);
             builder.Property(monthlyLedger => monthlyLedger.Year).HasMaxLength(4);
             builder.Property(monthlyLedger => monthlyLedger.Month).HasMaxLength(2);
             builder.Property(monthlyLedger => monthlyLedger.Expenses).HasPrecision(10, 3);

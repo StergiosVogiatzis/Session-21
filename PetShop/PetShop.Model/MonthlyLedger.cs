@@ -1,6 +1,6 @@
 ﻿namespace PetShop.Model
 {
-    public class MonthlyLedger
+    public class MonthlyLedger : BaseEntity
     {
         public string Year { get; set; }
         public string Month { get; set; }
