@@ -7,23 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly PetShopContext _context;
+        private readonly IEntityRepo<Employee> _employeeRepo;
 
-        public EmployeesController(PetShopContext context)
+        public EmployeesController(IEntityRepo<Employee> employeeRepo)
         {
-            _context = context;
+            _employeeRepo = employeeRepo;
         }
 
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Employees.ToListAsync());
+            return View(await _employeeRepo.GetAllAsync());
         }
 
         // GET: Employees/Details/5
@@ -34,14 +37,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var employee = await _employeeRepo.GetByIdAsync(id.Value);
             if (employee == null)
             {
                 return NotFound();
             }
-
-            return View(employee);
+            var viewModel = new EmployeeViewModel { Name = employee.Name, Surname = employee.Surname, SallaryPerMonth = employee.SallaryPerMonth, EmployeeType = employee.EmployeeType };
+            return View(viewModel);
         }
 
         // GET: Employees/Create
@@ -55,16 +57,15 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Surname,SallaryPerMonth,EmployeeType,ID")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Name,Surname,SallaryPerMonth,EmployeeType")] EmployeeCreateViewModel employeeView)
         {
             if (ModelState.IsValid)
             {
-                employee.ID = Guid.NewGuid();
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                var employee = new Employee { Name = employeeView.Name, Surname = employeeView.Surname, SallaryPerMonth = employeeView.SallaryPerMonth, EmployeeType = employeeView.EmployeeType };
+                await _employeeRepo.AddAsync(employee);
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(employeeView);
         }
 
         // GET: Employees/Edit/5
@@ -75,12 +76,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _employeeRepo.GetByIdAsync(id.Value);
             if (employee == null)
             {
                 return NotFound();
             }
-            return View(employee);
+            var employeeView = new EmployeeUpdateViewModel { Name = employee.Name, Surname = employee.Surname, SallaryPerMonth = employee.SallaryPerMonth, EmployeeType = employee.EmployeeType };
+            return View(employeeView);
         }
 
         // POST: Employees/Edit/5
@@ -88,34 +90,26 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Surname,SallaryPerMonth,EmployeeType,ID")] Employee employee)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Surname,SallaryPerMonth,EmployeeType,ID")] EmployeeUpdateViewModel employeeView)
         {
-            if (id != employee.ID)
+            if (id != employeeView.ID)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentEmployee = await _employeeRepo.GetByIdAsync(id);
+                if (currentEmployee == null)
+                    return BadRequest("Could not find Employee");
+                currentEmployee.Name = employeeView.Name;
+                currentEmployee.Surname = employeeView.Surname;
+                currentEmployee.SallaryPerMonth = employeeView.SallaryPerMonth;
+                currentEmployee.EmployeeType = employeeView.EmployeeType;
+                await _employeeRepo.UpdateAsync(id, currentEmployee);
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(employeeView);
         }
 
         // GET: Employees/Delete/5
@@ -126,14 +120,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var employee = await _employeeRepo.GetByIdAsync(id.Value);
             if (employee == null)
             {
                 return NotFound();
             }
-
-            return View(employee);
+            var employeeView = new EmployeeDeleteViewModel { ID = employee.ID, Name = employee.Name, Surname = employee.Surname, SallaryPerMonth = employee.SallaryPerMonth, EmployeeType = employee.EmployeeType};
+            return View(employeeView);
         }
 
         // POST: Employees/Delete/5
@@ -141,9 +134,7 @@ namespace PetShop.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            await _employeeRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

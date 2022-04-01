@@ -19,7 +19,6 @@ namespace PetShop.EF.Configuration
             builder.Property(employee => employee.Surname).HasMaxLength(50);
             builder.Property(employee => employee.SallaryPerMonth).HasPrecision(10, 3);
             builder.Property(employee => employee.EmployeeType).HasConversion(employeeType => employeeType.ToString(), employeeType => (EmployeeType)Enum.Parse(typeof(EmployeeType), employeeType)).HasMaxLength(15);
-
             builder.HasMany(employee => employee.Transactions)
                 .WithOne(transaction => transaction.Employee)
                 .HasForeignKey(transaction => transaction.EmployeeID);
