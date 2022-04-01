@@ -59,7 +59,7 @@ namespace PetShop.Web.Controllers
             ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name");
             ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name");
             ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed");
-            ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "ID");
+            ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType");
             return View();
         }
 
