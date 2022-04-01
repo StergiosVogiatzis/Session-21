@@ -7,24 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
 {
     public class TransactionsController : Controller
     {
         private readonly PetShopContext _context;
-
-        public TransactionsController(PetShopContext context)
+        private readonly IEntityRepo<Transaction> _transactionRepo;
+        // private readonly TransactionHandler
+        public TransactionsController(IEntityRepo<Transaction> transactionRepo, PetShopContext context)
         {
+            _transactionRepo = transactionRepo;
             _context = context;
         }
 
         // GET: Transactions
         public async Task<IActionResult> Index()
         {
-            var petShopContext = _context.Transactions.Include(t => t.Customer).Include(t => t.Employee).Include(t => t.Pet).Include(t => t.PetFood);
-            return View(await petShopContext.ToListAsync());
+            
+            return View(await _transactionRepo.GetAllAsync());
         }
 
         // GET: Transactions/Details/5
@@ -64,20 +68,43 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Date,PetID,CustomerID,EmployeeID,PetFoodID,PetPrice,PetFoodQty,PetFoodPrice,TotalPrice,ID")] Transaction transaction)
+        public async Task<IActionResult> Create([Bind("Date,PetID,CustomerID,EmployeeID,PetFoodID,PetPrice,PetFoodQty,PetFoodPrice,TotalPrice")] TransactionCreateViewModel transactionView)
         {
             if (ModelState.IsValid)
             {
-                transaction.ID = Guid.NewGuid();
-                _context.Add(transaction);
-                await _context.SaveChangesAsync();
+                var transaction = new Transaction
+                {
+                    Date = transactionView.Date,
+                    PetID = transactionView.PetID,
+                    CustomerID = transactionView.CustomerID,
+                    EmployeeID = transactionView.EmployeeID,
+                    PetFoodID = transactionView.PetFoodID,
+                    PetFoodQty = transactionView.PetFoodQty,
+                };
+                transaction.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID);
+                transaction.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
+                transaction.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
+                transaction.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
+
+                transaction.PetPrice = 50m;
+                transaction.PetFoodPrice = 80m;
+                transaction.TotalPrice = 200m;
+
+                //transactionView.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID);
+                //transactionView.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
+                //transactionView.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
+                //transactionView.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
+
+
+                await _transactionRepo.AddAsync(transaction);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name", transaction.CustomerID);
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name", transaction.EmployeeID);
-            ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed", transaction.PetID);
-            ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "ID", transaction.PetFoodID);
-            return View(transaction);
+
+            ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name", transactionView.CustomerID);
+            ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name", transactionView.EmployeeID);
+            ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed", transactionView.PetID);
+            ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType", transactionView.PetFoodID);
+            return View(transactionView);
         }
 
         // GET: Transactions/Edit/5

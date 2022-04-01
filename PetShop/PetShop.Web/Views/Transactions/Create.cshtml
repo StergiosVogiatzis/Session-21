@@ -1,4 +1,5 @@
-﻿@model PetShop.Model.Transaction
+﻿@using PetShop.Web.Models
+@model TransactionCreateViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -34,24 +35,9 @@
                 <select asp-for="PetFoodID" class ="form-control" asp-items="ViewBag.PetFoodID"></select>
             </div>
             <div class="form-group">
-                <label asp-for="PetPrice" class="control-label"></label>
-                <input asp-for="PetPrice" class="form-control" />
-                <span asp-validation-for="PetPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="PetFoodQty" class="control-label"></label>
                 <input asp-for="PetFoodQty" class="form-control" />
                 <span asp-validation-for="PetFoodQty" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PetFoodPrice" class="control-label"></label>
-                <input asp-for="PetFoodPrice" class="form-control" />
-                <span asp-validation-for="PetFoodPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalPrice" class="control-label"></label>
-                <input asp-for="TotalPrice" class="form-control" />
-                <span asp-validation-for="TotalPrice" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
