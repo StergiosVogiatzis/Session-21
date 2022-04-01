@@ -7,23 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
 {
     public class PetsController : Controller
     {
+        private readonly IEntityRepo<Pet> _petRepo;
         private readonly PetShopContext _context;
 
-        public PetsController(PetShopContext context)
+        public PetsController(IEntityRepo<Pet> petRepo)
         {
-            _context = context;
+            _petRepo = petRepo;
         }
 
         // GET: Pet
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Pets.ToListAsync());
+            return View(await _petRepo.GetAllAsync());
         }
 
         // GET: Pet/Details/5
@@ -34,14 +37,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var pet = await _context.Pets
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var pet = await _petRepo.GetAllAsync();
             if (pet == null)
             {
                 return NotFound();
             }
 
-            return View(pet);
+            return View(_petRepo);
         }
 
         // GET: Pet/Create
@@ -55,16 +57,19 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Breed,AnimalType,PetStatus,Price,Cost,ID")] Pet pet)
+        public async Task<IActionResult> Create([Bind("Breed,AnimalType,PetStatus,Price,Cost")] PetCreateViewModel petView)
         {
             if (ModelState.IsValid)
             {
-                pet.ID = Guid.NewGuid();
-                _context.Add(pet);
-                await _context.SaveChangesAsync();
+                var pet = new Pet { Breed = petView.Breed,
+                    AnimalType = petView.AnimalType,
+                    PetStatus = petView.PetStatus,
+                    Cost = petView.Cost,
+                    Price = petView.Price };
+                await _petRepo.AddAsync(pet);
                 return RedirectToAction(nameof(Index));
             }
-            return View(pet);
+            return View(petView);
         }
 
         // GET: Pet/Edit/5
@@ -75,12 +80,20 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var pet = await _context.Pets.FindAsync(id);
+            var pet = await _petRepo.GetByIdAsync(id.Value);
             if (pet == null)
             {
                 return NotFound();
             }
-            return View(pet);
+            var petView = new PetUpdateViewModel
+            {
+                Breed = pet.Breed,
+                AnimalType = pet.AnimalType,
+                PetStatus = pet.PetStatus,
+                Cost = pet.Cost,
+                Price = pet.Price
+            };
+            return View(petView);
         }
 
         // POST: Pet/Edit/5
@@ -88,64 +101,61 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Breed,AnimalType,PetStatus,Price,Cost,TransactionID,ID")] Pet pet)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Breed,AnimalType,PetStatus,Price,Cost,TransactionID,ID")] PetUpdateViewModel petView)
         {
-            if (id != pet.ID)
+            if (id != petView.ID)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(pet);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PetExists(pet.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentPet = await _petRepo.GetByIdAsync(id);
+                if (currentPet == null)
+                    return BadRequest("Could not find Pet");
+                currentPet.Breed = petView.Breed;
+                currentPet.AnimalType = petView.AnimalType;
+                currentPet.PetStatus = petView.PetStatus;
+                currentPet.Cost = petView.Cost;
+                currentPet.Price = petView.Price;
+                await _petRepo.UpdateAsync(id, currentPet);
                 return RedirectToAction(nameof(Index));
             }
-            return View(pet);
+            return View(petView);
         }
 
-        // GET: Pet/Delete/5
-        //public async Task<IActionResult> Delete(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        //GET: Pet/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var pet = await _context.Pets
-        //        .FirstOrDefaultAsync(m => m.ID == id);
-        //    if (pet == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var pet = await _petRepo.GetByIdAsync(id.Value);
+            if (pet == null)
+            {
+                return NotFound();
+            }
+            var petView = new PetDeleteViewModel {
+                Breed = pet.Breed,
+                AnimalType = pet.AnimalType,
+                PetStatus = pet.PetStatus,
+                Cost = pet.Cost,
+                Price = pet.Price
+            };
+            return View(petView);
+        }
 
-        //    return View(pet);
-        //}
-
-        //// POST: Pet/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(Guid id)
-        //{
-        //    var pet = await _context.Pets.FindAsync(id);
-        //    _context.Pets.Remove(pet);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+        // POST: Pet/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            
+            await _petRepo.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
 
         private bool PetExists(Guid id)
         {
