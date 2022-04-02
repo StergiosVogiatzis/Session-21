@@ -27,8 +27,12 @@ namespace PetShop.Web.Controllers
         // GET: Transactions
         public async Task<IActionResult> Index()
         {
-            
-            return View(await _transactionRepo.GetAllAsync());
+            var _transactionRepo = _context.Transactions
+                .Include(t => t.Customer)
+                .Include(t => t.Employee)
+                .Include(t => t.Pet)
+                .Include(t => t.PetFood);
+            return View(await _transactionRepo.ToListAsync());
         }
 
         // GET: Transactions/Details/5
