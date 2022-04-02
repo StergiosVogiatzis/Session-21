@@ -82,13 +82,14 @@ namespace PetShop.Web.Controllers
                     PetID = transactionView.PetID,
                     CustomerID = transactionView.CustomerID,
                     EmployeeID = transactionView.EmployeeID,
-                    PetFoodID = transactionView.PetFoodID,
+                    //PetFoodID = transactionView.PetFoodID,
                     PetFoodQty = transactionView.PetFoodQty,
                 };
                 transaction.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID);
                 transaction.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
                 transaction.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
-                transaction.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
+                transaction.PetFood = _context.PetFoods.FirstOrDefault(pet => pet.ID != Guid.Empty);
+                //transaction.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
 
                 transaction.PetPrice = 50m;
                 transaction.PetFoodPrice = 80m;
@@ -98,7 +99,7 @@ namespace PetShop.Web.Controllers
                 //transactionView.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
                 //transactionView.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
                 //transactionView.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
-
+                
 
                 await _transactionRepo.AddAsync(transaction);
                 return RedirectToAction(nameof(Index));
@@ -107,7 +108,7 @@ namespace PetShop.Web.Controllers
             ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name", transactionView.CustomerID);
             ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name", transactionView.EmployeeID);
             ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed", transactionView.PetID);
-            ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType", transactionView.PetFoodID);
+            //ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType", transactionView.PetFoodID);
             return View(transactionView);
         }
 

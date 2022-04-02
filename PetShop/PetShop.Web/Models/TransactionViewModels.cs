@@ -8,7 +8,7 @@ namespace PetShop.Web.Models
         public Guid PetID { get; set; }
         public Guid CustomerID { get; set; }
         public Guid EmployeeID { get; set; }
-        public Guid PetFoodID { get; set; }
+        //public Guid PetFoodID { get; set; }
         [System.ComponentModel.DataAnnotations.Range(1,Int32.MaxValue)]
         public int PetFoodQty { get; set; }
 

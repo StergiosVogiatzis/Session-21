@@ -6,6 +6,7 @@ namespace PetShop.Web.Handlers
 {
     public class MonthlyLedgerHandler
     {
+        private const int _RENT_COST = 2000;
         private readonly PetShopContext _context;
         private readonly MonthlyLedger _monthlyLedger;
 
@@ -15,17 +16,17 @@ namespace PetShop.Web.Handlers
             _monthlyLedger = monthlyLedger;
         }
 
-        public async Task<decimal> GetIncome(MonthlyLedger monthlyLedger)
+        public async Task<decimal> GetIncome()
         {
-            int year = Int32.Parse(monthlyLedger.Year);
-            int month = Int32.Parse(monthlyLedger.Month);
+            int year = Int32.Parse(_monthlyLedger.Year);
+            int month = Int32.Parse(_monthlyLedger.Month);
             return await _context.Transactions.Where(t => t.Date.Year == year && t.Date.Month == month).SumAsync(t => t.TotalPrice);
         }
 
-        private async Task<decimal> GetPetAndPetFoodExpences(MonthlyLedger monthlyLedger)
+        private async Task<decimal> GetPetAndPetFoodExpences()
         {
-            int year = Int32.Parse(monthlyLedger.Year);
-            int month = Int32.Parse(monthlyLedger.Month);
+            int year = Int32.Parse(_monthlyLedger.Year);
+            int month = Int32.Parse(_monthlyLedger.Month);
             var monthlyTransactions = await _context.Transactions.Where(t => t.Date.Year == year && t.Date.Month == month).ToListAsync();
             decimal expences = 0;
             foreach (var t in monthlyTransactions)
@@ -42,9 +43,9 @@ namespace PetShop.Web.Handlers
             return await _context.Employees.SumAsync(e => e.SallaryPerMonth);
         }
 
-        public async Task<decimal> GetMonthlyExpenses(MonthlyLedger monthlyLedger)
+        public async Task<decimal> GetMonthlyExpenses()
         {
-            return await GetPetAndPetFoodExpences(monthlyLedger) +  await GetStuffExpences() + 1200; 
+            return await GetPetAndPetFoodExpences() +  await GetStuffExpences() + _RENT_COST; 
         }
 
         public decimal GetTotal(MonthlyLedger monthlyLedger)
