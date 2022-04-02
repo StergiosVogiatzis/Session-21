@@ -15,9 +15,9 @@ namespace PetShop.Web.Handlers
             _context = context;
         }
 
-        public async Task<List<Pet>> GetAvailablePets()
+        public IEnumerable<Pet> GetAvailablePets()
         {
-            return await _context.Pets.Where(p => p.PetStatus == PetStatus.Recovering || p.PetStatus == PetStatus.OK).ToListAsync();
+            return _context.Pets.Where(p => p.PetStatus == PetStatus.Recovering || p.PetStatus == PetStatus.OK).ToList();
         }
 
         public decimal GetTotalPrice()
