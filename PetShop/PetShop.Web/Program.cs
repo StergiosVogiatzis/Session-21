@@ -12,6 +12,7 @@ builder.Services.AddScoped<IEntityRepo<Employee>, EmployeeRepo>();
 builder.Services.AddScoped<IEntityRepo<Pet>, PetRepo>();
 builder.Services.AddScoped<IEntityRepo<PetFood>, PetFoodRepo>();
 builder.Services.AddScoped<IEntityRepo<Transaction>, TransactionRepo>();
+builder.Services.AddScoped<IEntityRepo<MonthlyLedger>, MonthlyLedgerRepo>();
 
 
 var app = builder.Build();

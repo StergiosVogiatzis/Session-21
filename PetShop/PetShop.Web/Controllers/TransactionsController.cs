@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
 using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Handlers;
 using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
@@ -17,6 +18,7 @@ namespace PetShop.Web.Controllers
     {
         private readonly PetShopContext _context;
         private readonly IEntityRepo<Transaction> _transactionRepo;
+        private TransactionHandler _transactionHandler;
         // private readonly TransactionHandler
         public TransactionsController(IEntityRepo<Transaction> transactionRepo, PetShopContext context)
         {
@@ -60,9 +62,11 @@ namespace PetShop.Web.Controllers
         // GET: Transactions/Create
         public IActionResult Create()
         {
+            _transactionHandler=new TransactionHandler(_context);
+            var transaction = _transactionHandler.GetAvailablePets();
             ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name");
             ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name");
-            ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed");
+            ViewData["PetID"] = new SelectList(transaction, "ID", "Breed");
             ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType");
             return View();
         }
@@ -76,30 +80,28 @@ namespace PetShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 var transaction = new Transaction
                 {
                     Date = transactionView.Date,
                     PetID = transactionView.PetID,
                     CustomerID = transactionView.CustomerID,
                     EmployeeID = transactionView.EmployeeID,
-                    //PetFoodID = transactionView.PetFoodID,
                     PetFoodQty = transactionView.PetFoodQty,
                 };
                 transaction.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID);
                 transaction.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
                 transaction.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
-                transaction.PetFood = _context.PetFoods.FirstOrDefault(pet => pet.ID != Guid.Empty);
-                //transaction.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
+               
+                transaction.PetPrice = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID).Price;
+               
+                _transactionHandler = new TransactionHandler(transaction, _context);
+                if (!await _transactionHandler.SetPetFood())
+                    return BadRequest("Could not find PetFood for the particular animal you want to sell");
 
-                transaction.PetPrice = 50m;
-                transaction.PetFoodPrice = 80m;
-                transaction.TotalPrice = 200m;
+                transaction.TotalPrice = _transactionHandler.GetTotalPrice();
 
-                //transactionView.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transactionView.PetID);
-                //transactionView.Customer = _context.Customers.FirstOrDefault(customer => customer.ID == transactionView.CustomerID);
-                //transactionView.Employee = _context.Employees.FirstOrDefault(emp => emp.ID == transactionView.EmployeeID);
-                //transactionView.PetFood = _context.PetFoods.FirstOrDefault(petf => petf.ID == transactionView.PetFoodID);
-                
+                transaction.Pet.PetStatus = PetStatus.Sold;
 
                 await _transactionRepo.AddAsync(transaction);
                 return RedirectToAction(nameof(Index));
@@ -108,7 +110,7 @@ namespace PetShop.Web.Controllers
             ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name", transactionView.CustomerID);
             ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name", transactionView.EmployeeID);
             ViewData["PetID"] = new SelectList(_context.Pets, "ID", "Breed", transactionView.PetID);
-            //ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType", transactionView.PetFoodID);
+            
             return View(transactionView);
         }
 
@@ -199,6 +201,8 @@ namespace PetShop.Web.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var transaction = await _context.Transactions.FindAsync(id);
+            transaction.Pet = _context.Pets.FirstOrDefault(pet => pet.ID == transaction.PetID);
+            transaction.Pet.PetStatus = PetStatus.OK;
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
