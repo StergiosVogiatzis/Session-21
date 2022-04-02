@@ -33,8 +33,7 @@ namespace PetShop.EF.Context
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            var connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PetShopDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-            
+            var connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PetShopDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"; 
             optionsBuilder.UseSqlServer(connString);
         }
     }
