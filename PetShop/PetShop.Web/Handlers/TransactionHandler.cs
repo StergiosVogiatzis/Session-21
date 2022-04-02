@@ -24,5 +24,15 @@ namespace PetShop.Web.Handlers
         {
             return _transaction.PetPrice + (_transaction.PetFoodQty - 1) * _transaction.PetFoodPrice;
         }
+
+        public async Task SetPetFood()
+        {
+            var petFood = await _context.PetFoods.FirstOrDefaultAsync(p => p.AnimalType == _transaction.Pet.AnimalType);
+            _transaction.PetFood.ID = petFood.ID;
+            _transaction.PetFood.Price = petFood.Price;
+            _transaction.PetFood.Cost = petFood.Cost;
+            _transaction.PetFood.AnimalType = petFood.AnimalType;
+            _transaction.PetFoodID = petFood.ID;
+        }
     }
 }
