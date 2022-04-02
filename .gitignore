@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/PetShop/PetShop.Web/.cr/personal/FavoritesList/List.xml
