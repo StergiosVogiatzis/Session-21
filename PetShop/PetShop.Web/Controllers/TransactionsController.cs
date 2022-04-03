@@ -97,7 +97,10 @@ namespace PetShop.Web.Controllers
                
                 _transactionHandler = new TransactionHandler(transaction, _context);
                 if (!await _transactionHandler.SetPetFood())
-                    return BadRequest("Could not find PetFood for the particular animal you want to sell");
+                {
+                    ViewData["ErrorMessage"] = "Could not find PetFood for the particular animal you want!";
+                    return View(transactionView);
+                }
 
                 transaction.TotalPrice = _transactionHandler.GetTotalPrice();
 
