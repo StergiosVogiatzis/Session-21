@@ -1,6 +1,7 @@
 using PetShop.EF.Context;
 using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,8 @@ builder.Services.AddScoped<IEntityRepo<Employee>, EmployeeRepo>();
 builder.Services.AddScoped<IEntityRepo<Pet>, PetRepo>();
 builder.Services.AddScoped<IEntityRepo<PetFood>, PetFoodRepo>();
 builder.Services.AddScoped<IEntityRepo<Transaction>, TransactionRepo>();
-
+builder.Services.AddScoped<IEntityRepo<PetReport>, PetReportRepo>();
+builder.Services.AddScoped<PetReportHandler>();
 
 var app = builder.Build();
 

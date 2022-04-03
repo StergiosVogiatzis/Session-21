@@ -8,8 +8,7 @@
         public int TotalSold { get; set; }
         public PetReport()
         {
-            Year = DateTime.Now.Year.ToString();
-            Month = DateTime.Now.Month.ToString();
+            
         }
     }
 }

@@ -7,23 +7,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetShop.EF.Context;
+using PetShop.EF.Repos;
 using PetShop.Model;
+using PetShop.Web.Handlers;
+using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
 {
     public class PetReportsController : Controller
     {
-        private readonly PetShopContext _context;
-
-        public PetReportsController(PetShopContext context)
+        private readonly IEntityRepo<PetReport> _petReportRepo;
+        private readonly PetReportHandler _petReportHandler;
+        public PetReportsController(IEntityRepo<PetReport> context , PetReportHandler petReportHandler)
         {
-            _context = context;
+            _petReportHandler = petReportHandler;
+            _petReportRepo = context;
         }
 
         // GET: PetReports
         public async Task<IActionResult> Index()
         {
-            return View(await _context.PetReports.ToListAsync());
+            return View(await _petReportRepo.GetAllAsync());
         }
 
         // GET: PetReports/Details/5
@@ -34,13 +38,11 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var petReport = await _context.PetReports
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var petReport = await _petReportRepo.GetByIdAsync(id.Value);
             if (petReport == null)
             {
                 return NotFound();
             }
-
             return View(petReport);
         }
 
@@ -55,16 +57,21 @@ namespace PetShop.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Year,Month,AnimalType,TotalSold,ID")] PetReport petReport)
+        public async Task<IActionResult> Create([Bind("Year,Month,AnimalType")] PetReportCreateViewModel petReportView)
         {
             if (ModelState.IsValid)
             {
-                petReport.ID = Guid.NewGuid();
-                _context.Add(petReport);
-                await _context.SaveChangesAsync();
+                var petReport = new PetReport { Year = petReportView.Year, Month = petReportView.Month, AnimalType = petReportView.AnimalType };
+                petReport.TotalSold = _petReportHandler.TotalSold(petReport);
+                if (await _petReportHandler.PetReportExists(petReport))
+                {
+                    ViewData["ErrorMessage"] = "This Pet Report already exists!";
+                    return View(petReportView);
+                }
+                await _petReportRepo.AddAsync(petReport);
                 return RedirectToAction(nameof(Index));
             }
-            return View(petReport);
+            return View(petReportView);
         }
 
         // GET: PetReports/Edit/5
@@ -75,7 +82,7 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var petReport = await _context.PetReports.FindAsync(id);
+            var petReport = await _petReportRepo.GetByIdAsync(id.Value);
             if (petReport == null)
             {
                 return NotFound();
@@ -99,19 +106,19 @@ namespace PetShop.Web.Controllers
             {
                 try
                 {
-                    _context.Update(petReport);
-                    await _context.SaveChangesAsync();
+                    await _petReportRepo.UpdateAsync(id, petReport);
+                     
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PetReportExists(petReport.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
+                    //if (!PetReportExists(petReport.ID))
+                    //{
+                    //    return NotFound();
+                    //}
+                    //else
+                    //{
                         throw;
-                    }
+                    //}
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -126,14 +133,13 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var petReport = await _context.PetReports
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var petReport = await _petReportRepo.GetByIdAsync(id.Value);
             if (petReport == null)
             {
                 return NotFound();
             }
-
-            return View(petReport);
+            var petReportView = new PetReportDeleteViewModel { ID = petReport.ID, Year =petReport.Year, Month = petReport.Month, AnimalType = petReport.AnimalType, TotalSold = petReport.TotalSold }; 
+            return View(petReportView);
         }
 
         // POST: PetReports/Delete/5
@@ -141,15 +147,14 @@ namespace PetShop.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var petReport = await _context.PetReports.FindAsync(id);
-            _context.PetReports.Remove(petReport);
-            await _context.SaveChangesAsync();
+            
+            await _petReportRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PetReportExists(Guid id)
+        private async Task<bool> PetReportExists(Guid id)
         {
-            return _context.PetReports.Any(e => e.ID == id);
+           return await _petReportRepo.GetByIdAsync(id) is null ? false : true ;
         }
     }
 }

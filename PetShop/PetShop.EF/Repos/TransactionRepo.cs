@@ -31,7 +31,7 @@ namespace PetShop.EF.Repos
 
         public async Task<IEnumerable<Transaction>> GetAllAsync()
         {
-            return await _context.Transactions.ToListAsync();
+            return await _context.Transactions.Include(transaction => transaction.Pet).Include(transaction => transaction.Customer).Include(transaction => transaction.Employee).Include(transaction => transaction.PetFood).ToListAsync();
         }
 
         public async Task<Transaction?> GetByIdAsync(Guid id)
@@ -58,6 +58,8 @@ namespace PetShop.EF.Repos
 
             context.Transactions.Remove(currentTransaction);
         }
+
+
         
     }
 }

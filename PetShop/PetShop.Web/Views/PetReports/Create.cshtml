@@ -1,4 +1,6 @@
-﻿@model PetShop.Model.PetReport
+﻿@using PetShop.Model
+@using PetShop.Web.Models
+@model PetReportCreateViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -14,26 +16,38 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Year" class="control-label"></label>
-                <input asp-for="Year" class="form-control" />
+                <input asp-for="Year" type="number" class="form-control" min="1999" max="2050" step="1" />
                 <span asp-validation-for="Year" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Month" class="control-label"></label>
-                <input asp-for="Month" class="form-control" />
+                <select asp-for="Month" class ="form-control">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
                 <span asp-validation-for="Month" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="AnimalType" class="control-label"></label>
-                <select asp-for="AnimalType" class="form-control"></select>
+                <select asp-for="AnimalType" class="form-control" asp-items="Html.GetEnumSelectList<AnimalType>()" ></select>
                 <span asp-validation-for="AnimalType" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="TotalSold" class="control-label"></label>
-                <input asp-for="TotalSold" class="form-control" />
-                <span asp-validation-for="TotalSold" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                @if (ViewData["ErrorMessage"] is not null)
+                {
+                    <label class="text-danger">@ViewData["ErrorMessage"]</label>
+                }   
             </div>
         </form>
     </div>
