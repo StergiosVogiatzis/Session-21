@@ -1,4 +1,5 @@
 ﻿using PetShop.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetShop.Web.Models
 {
@@ -9,7 +10,7 @@ namespace PetShop.Web.Models
         public Guid CustomerID { get; set; }
         public Guid EmployeeID { get; set; }
         //public Guid PetFoodID { get; set; }
-        [System.ComponentModel.DataAnnotations.Range(1,Int32.MaxValue)]
+        [Range(1,Int32.MaxValue)]
         public int PetFoodQty { get; set; }
 
     }

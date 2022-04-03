@@ -17,7 +17,7 @@ namespace PetShop.EF.Configuration
             builder.Property(transaction => transaction.ID);
             builder.Property(transaction => transaction.PetFoodPrice).HasPrecision(10, 3);
             builder.Property(transaction => transaction.PetPrice).HasPrecision(10, 3);
-            builder.Property(transaction => transaction.TotalPrice).HasPrecision(10, 3);
+            builder.Property(transaction => transaction.TotalPrice);
             builder.Property(transaction => transaction.CustomerID).IsRequired();
             builder.Property(transaction => transaction.EmployeeID).IsRequired();
             builder.Property(transaction => transaction.PetID).IsRequired();

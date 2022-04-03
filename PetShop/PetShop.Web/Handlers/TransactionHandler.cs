@@ -9,10 +9,14 @@ namespace PetShop.Web.Handlers
         private readonly Transaction _transaction;
         private readonly PetShopContext _context;
 
-        public TransactionHandler(Transaction transaction, PetShopContext context)
+        public TransactionHandler(PetShopContext context)
+        {
+            _context = context;
+        }
+
+        public TransactionHandler(Transaction transaction, PetShopContext context) :this(context)
         {
             _transaction = transaction;
-            _context = context;
         }
 
         public IEnumerable<Pet> GetAvailablePets()
@@ -25,14 +29,14 @@ namespace PetShop.Web.Handlers
             return _transaction.PetPrice + (_transaction.PetFoodQty - 1) * _transaction.PetFoodPrice;
         }
 
-        public async Task SetPetFood()
+        public async Task<bool> SetPetFood()
         {
             var petFood = await _context.PetFoods.FirstOrDefaultAsync(p => p.AnimalType == _transaction.Pet.AnimalType);
-            _transaction.PetFood.ID = petFood.ID;
-            _transaction.PetFood.Price = petFood.Price;
-            _transaction.PetFood.Cost = petFood.Cost;
-            _transaction.PetFood.AnimalType = petFood.AnimalType;
-            _transaction.PetFoodID = petFood.ID;
+            if (petFood == null)
+                return false;
+            _transaction.PetFood= petFood;
+            _transaction.PetFoodPrice=petFood.Price;
+            return true;
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<PetShop.Model.Pet>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Pets List";
 }
 
-<h1>Index</h1>
+<h1>Pets</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -16,10 +16,10 @@
                 @Html.DisplayNameFor(model => model.Breed)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AnimalType)
+                Animal Type
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PetStatus)
+                Pet Status
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
