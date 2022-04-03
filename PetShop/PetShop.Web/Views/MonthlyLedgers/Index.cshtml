@@ -1,10 +1,11 @@
-﻿@model IEnumerable<PetShop.Model.MonthlyLedger>
+﻿@using System.Globalization
+@model IEnumerable<PetShop.Model.MonthlyLedger>
 
 @{
     ViewData["Title"] = "Monthly Ledgers List";
 }
 
-<h1>Index</h1>
+<h1>Monthly Ledgers</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -37,7 +38,7 @@
                  @Html.DisplayFor(modelItem => item.Year)
             </td>
             <td>
-               @Html.DisplayFor(modelItem => item.Month)
+               @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Int32.Parse(item.Month))
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Income)

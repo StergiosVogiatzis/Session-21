@@ -49,7 +49,9 @@ namespace PetShop.EF.Repos
         {
             if (entity.ID == Guid.Empty)
                 throw new ArgumentException("Given entity should not have Id set", nameof(entity));
-
+            var exist = context.MonthlyLedgers.FirstOrDefault(ml => ml.Year == entity.Year && ml.Month == entity.Month);
+            if (exist != null)
+                return;
             context.MonthlyLedgers.Add(entity);
         }
 

@@ -1,35 +1,28 @@
-﻿namespace PetShop.Web.Models
+﻿using System.ComponentModel.DataAnnotations;
+namespace PetShop.Web.Models
 {
     public class CustomerViewModel
     {
+        [MaxLength(50)]
         public string Name { get; set; }
+        [MaxLength(50)]
         public string Surname { get; set; }
+        [MaxLength(20)]
         public string Phone { get; set; }
+        [MaxLength(10)]
         public string TIN { get; set; }
     }
 
-    public class CustomerCreateViewModel
+    public class CustomerCreateViewModel : CustomerViewModel
     {
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Phone { get; set; }
-        public string TIN { get; set; }
     }
 
-    public class CustomerUpdateViewModel
+    public class CustomerUpdateViewModel : CustomerViewModel
     {
         public Guid ID { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Phone { get; set; }
-        public string TIN { get; set; }
     } 
-    public class CustomerDeleteViewModel
+    public class CustomerDeleteViewModel : CustomerViewModel
     {
         public Guid ID { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Phone { get; set; }
-        public string TIN { get; set; }
     } 
  }

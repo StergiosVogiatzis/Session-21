@@ -25,12 +25,12 @@
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SallaryPerMonth" class="control-label"></label>
+                <label asp-for="SallaryPerMonth" class="control-label">Sallary Per Month</label>
                 <input asp-for="SallaryPerMonth" class="form-control" />
                 <span asp-validation-for="SallaryPerMonth" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EmployeeType" class="control-label"></label>
+                <label asp-for="EmployeeType" class="control-label">Employee Type</label>
                 <select asp-for="EmployeeType" class="form-control" asp-items="Html.GetEnumSelectList<EmployeeType>()"></select>
                 <span asp-validation-for="EmployeeType" class="text-danger"></span>
             </div>

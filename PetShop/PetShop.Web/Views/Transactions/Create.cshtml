@@ -19,15 +19,15 @@
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PetID" class="control-label"></label>
+                <label asp-for="PetID" class="control-label">Pet</label>
                 <select asp-for="PetID" class ="form-control" asp-items="ViewBag.PetID"></select>
             </div>
             <div class="form-group">
-                <label asp-for="CustomerID" class="control-label"></label>
+                <label asp-for="CustomerID" class="control-label">Customer</label>
                 <select asp-for="CustomerID" class ="form-control" asp-items="ViewBag.CustomerID"></select>
             </div>
             <div class="form-group">
-                <label asp-for="EmployeeID" class="control-label"></label>
+                <label asp-for="EmployeeID" class="control-label">Employee</label>
                 <select asp-for="EmployeeID" class ="form-control" asp-items="ViewBag.EmployeeID"></select>
             </div>
             @*<div class="form-group">
@@ -35,7 +35,7 @@
                 <select asp-for="PetFoodID" class ="form-control" asp-items="ViewBag.PetFoodID"></select>
             </div>*@
             <div class="form-group">
-                <label asp-for="PetFoodQty" class="control-label"></label>
+                <label asp-for="PetFoodQty" class="control-label">Pet Food Quantity</label>
                 <input asp-for="PetFoodQty" class="form-control" />
                 <span asp-validation-for="PetFoodQty" class="text-danger"></span>
             </div>

@@ -1,11 +1,14 @@
 ﻿using PetShop.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetShop.Web.Models
 {
     public class PetFoodViewModel
     {
         public AnimalType AnimalType { get; set; }
+        [Range(0, 9999999)]
         public decimal Cost { get; set; }
+        [Range(0, 9999999)]
         public decimal Price { get; set; }
     }
 
