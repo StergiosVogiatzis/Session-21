@@ -75,7 +75,11 @@ namespace PetShop.Web.Controllers
                 monthlyLedger.Income= await _monthlyLedgerHandler.GetIncome();
                 monthlyLedger.Expenses=await _monthlyLedgerHandler.GetMonthlyExpenses();
                 monthlyLedger.Total =_monthlyLedgerHandler.GetTotal(monthlyLedger);
-
+                if (await _monthlyLedgerHandler.MonthlyLedgerExists(monthlyLedger))
+                {
+                    ViewData["ErrorMessage"] = "This Monthly Ledger already exists!";
+                    return View(monthlyLedger);
+                }
                 await _logger.AddAsync(monthlyLedger);
                 return RedirectToAction(nameof(Index));
             }

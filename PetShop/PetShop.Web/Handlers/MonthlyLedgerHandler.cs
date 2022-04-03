@@ -58,5 +58,9 @@ namespace PetShop.Web.Handlers
         {
             return monthlyLedger.Income - monthlyLedger.Expenses;
         }
+        public async Task<bool> MonthlyLedgerExists(MonthlyLedger monthlyLedger)
+        {
+            return await _context.PetReports.FirstOrDefaultAsync(monthlyL => monthlyL.Year == monthlyLedger.Year && monthlyL.Month == monthlyLedger.Month) is not null;
+        }
     }
 }
