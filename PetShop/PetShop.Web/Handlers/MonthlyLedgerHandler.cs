@@ -60,7 +60,7 @@ namespace PetShop.Web.Handlers
         }
         public async Task<bool> MonthlyLedgerExists(MonthlyLedger monthlyLedger)
         {
-            return await _context.PetReports.FirstOrDefaultAsync(monthlyL => monthlyL.Year == monthlyLedger.Year && monthlyL.Month == monthlyLedger.Month) is not null;
+            return await _context.MonthlyLedgers.FirstOrDefaultAsync(monthlyL => monthlyL.Year == monthlyLedger.Year && monthlyL.Month == monthlyLedger.Month) is not null;
         }
     }
 }
