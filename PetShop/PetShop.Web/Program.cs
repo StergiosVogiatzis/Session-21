@@ -18,7 +18,6 @@ builder.Services.AddScoped<PetReportHandler>();
 builder.Services.AddScoped<IEntityRepo<MonthlyLedger>, MonthlyLedgerRepo>();
 builder.Services.AddScoped<MonthlyLedgerHandler>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

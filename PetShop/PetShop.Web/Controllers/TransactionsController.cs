@@ -101,6 +101,7 @@ namespace PetShop.Web.Controllers
             }
 
             var transaction = await _transactionRepo.GetByIdAsync(id.Value);
+
             if (transaction == null)
             {
                 return NotFound();
