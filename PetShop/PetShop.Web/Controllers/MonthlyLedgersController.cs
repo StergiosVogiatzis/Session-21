@@ -13,23 +13,23 @@ using PetShop.Web.Handlers;
 using PetShop.Web.Models;
 
 namespace PetShop.Web.Controllers
-{
+{      
     public class MonthlyLedgersController : Controller
     {
-        private readonly PetShopContext _context;
-        private readonly IEntityRepo<MonthlyLedger> _logger;
+        
+        private readonly IEntityRepo<MonthlyLedger> _monthlyLedgerRepo;
         private MonthlyLedgerHandler _monthlyLedgerHandler;
 
-        public MonthlyLedgersController(IEntityRepo<MonthlyLedger> entity, PetShopContext context)
+        public MonthlyLedgersController(IEntityRepo<MonthlyLedger> entity, MonthlyLedgerHandler monthlyLedgerHandler) 
         {
-            _logger = entity;
-            _context = context;
+            _monthlyLedgerRepo = entity; 
+            _monthlyLedgerHandler = monthlyLedgerHandler; 
         }
 
         // GET: MonthlyLedgers
         public async Task<IActionResult> Index()
         {
-            return View(await _logger.GetAllAsync());
+            return View(await _monthlyLedgerRepo.GetAllAsync());
         }
         // GET: MonthlyLedgers/Create
         public IActionResult Create()
@@ -50,75 +50,23 @@ namespace PetShop.Web.Controllers
                 {
                     Month = monthlyLedgerView.Month,
                     Year = monthlyLedgerView.Year,
-                };
-
-                _monthlyLedgerHandler = new MonthlyLedgerHandler(_context, monthlyLedger);
-                monthlyLedger.Income= await _monthlyLedgerHandler.GetIncome();
-                monthlyLedger.Expenses=await _monthlyLedgerHandler.GetMonthlyExpenses();
+                }; 
+                monthlyLedger.Income= await _monthlyLedgerHandler.GetIncome(monthlyLedger);
+                monthlyLedger.Expenses=await _monthlyLedgerHandler.GetMonthlyExpenses(monthlyLedger);
                 monthlyLedger.Total =_monthlyLedgerHandler.GetTotal(monthlyLedger);
                 if (await _monthlyLedgerHandler.MonthlyLedgerExists(monthlyLedger))
                 {
                     ViewData["ErrorMessage"] = "This Monthly Ledger already exists!";
                     return View(monthlyLedger);
                 }
-                await _logger.AddAsync(monthlyLedger);
+                await _monthlyLedgerRepo.AddAsync(monthlyLedger);
                 return RedirectToAction(nameof(Index));
             }
 
             return View(monthlyLedgerView);
         }
 
-        // GET: MonthlyLedgers/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var monthlyLedger = await _context.MonthlyLedgers.FindAsync(id);
-            if (monthlyLedger == null)
-            {
-                return NotFound();
-            }
-            return View(monthlyLedger);
-        }
-
-        // POST: MonthlyLedgers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Year,Month,Income,Expenses,Total")] MonthlyLedger monthlyLedger)
-        {
-            if (id != monthlyLedger.Year)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(monthlyLedger);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MonthlyLedgerExists(monthlyLedger.Year))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(monthlyLedger);
-        }
-
+       
         // GET: MonthlyLedgers/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -127,7 +75,7 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
 
-            var monthlyLedger = await _logger.GetByIdAsync(id);
+            var monthlyLedger = await _monthlyLedgerRepo.GetByIdAsync(id);
             if (monthlyLedger == null)
             {
                 return NotFound();
@@ -148,13 +96,8 @@ namespace PetShop.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            await _logger.DeleteAsync(id);
+            await _monthlyLedgerRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool MonthlyLedgerExists(string id)
-        {
-            return _context.MonthlyLedgers.Any(e => e.Year == id);
         }
     }
 }

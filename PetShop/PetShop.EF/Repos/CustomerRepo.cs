@@ -36,9 +36,8 @@ namespace PetShop.EF.Repos
 
         public async Task UpdateAsync(Guid id, Customer entity)
         {
-            if(await UpdateLogic(id, entity)){
-                await context.SaveChangesAsync();
-            }
+            UpdateLogic(id, entity);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -56,20 +55,17 @@ namespace PetShop.EF.Repos
             context.Customers.Remove(currentCustomer);
         }
 
-        private async Task<bool> UpdateLogic(Guid id, Customer entity)
+        private void UpdateLogic(Guid id, Customer entity)
         {
             var currentCustomer = context.Customers.SingleOrDefault(customer => customer.ID == id);
             if (currentCustomer is null)
                 throw new KeyNotFoundException($"Given id '{id}' was not found in database");
-            if (!(await TINExists(entity)))
-            {
-                currentCustomer.Name = entity.Name;
-                currentCustomer.Surname = entity.Surname;
-                currentCustomer.TIN = entity.TIN;
-                currentCustomer.Phone = entity.Phone;
-                return true;
-            }
-            return false;
+            
+            currentCustomer.Name = entity.Name;
+            currentCustomer.Surname = entity.Surname;
+            currentCustomer.TIN = entity.TIN;
+            currentCustomer.Phone = entity.Phone;
+            
         }
 
         private async Task AddLogic(Customer entity)
@@ -83,7 +79,7 @@ namespace PetShop.EF.Repos
             
         }
 
-        private async Task<bool> TINExists(Customer entity)
+        public async Task<bool> TINExists(Customer entity)
         {
             return await context.Customers.SingleOrDefaultAsync(customer => customer.TIN == entity.TIN) is not null;
         }

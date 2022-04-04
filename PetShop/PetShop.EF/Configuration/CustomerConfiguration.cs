@@ -19,6 +19,7 @@ namespace PetShop.EF.Configuration
             builder.Property(customer => customer.Surname).HasMaxLength(50);
             builder.Property(customer => customer.Phone).HasMaxLength(20);
             builder.Property(customer => customer.TIN).HasMaxLength(10).IsRequired();
+            builder.HasIndex(customer => customer.TIN).IsUnique();
 
             builder.HasMany(customer => customer.Transactions)
                 .WithOne(transaction => transaction.Customer)

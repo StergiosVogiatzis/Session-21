@@ -31,12 +31,12 @@ namespace PetShop.EF.Repos
 
         public async Task<IEnumerable<Transaction>> GetAllAsync()
         {
-            return await _context.Transactions.Include(transaction => transaction.Pet).Include(transaction => transaction.Customer).Include(transaction => transaction.Employee).Include(transaction => transaction.PetFood).ToListAsync();
+            return await _context.Transactions.Include(transaction => transaction.Pet).Include(transaction => transaction.Customer).Include(transaction => transaction.Employee).Include(transaction => transaction.PetFood).ToListAsync();//Made by Fotis Grammenos 3:40pm 4/4
         }
 
         public async Task<Transaction?> GetByIdAsync(Guid id)
         {
-            return await _context.Transactions.SingleOrDefaultAsync(transaction => transaction.ID == id);
+            return await _context.Transactions.Include(transaction => transaction.Pet).Include(transaction => transaction.Customer).Include(transaction => transaction.Employee).Include(transaction => transaction.PetFood).SingleOrDefaultAsync(transaction => transaction.ID == id); //Made by Fotis Grammenos 3:40pm 4/4
         }
 
         public async Task UpdateAsync(Guid id, Transaction entity)

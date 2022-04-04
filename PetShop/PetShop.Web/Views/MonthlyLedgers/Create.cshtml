@@ -14,7 +14,6 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Year" class="control-label"></label>
-                @*<input asp-for="Year" class="form-control" />*@
                 @{
                     var years = new List<string>();
                     years.Add("2020");
@@ -27,71 +26,20 @@
             </div>
             <div class="form-group">
                 <label asp-for="Month" class="control-label"></label>
-                @{
-                    var items = new List<SelectListItem>();
-                    items.Add(new SelectListItem
-                    {
-                        Text = "January",
-                        Value = "1"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "Fabruary",
-                        Value = "2"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "March",
-                        Value = "3"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "April",
-                        Value = "4"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "May",
-                        Value = "5"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "June",
-                        Value = "6"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "July",
-                        Value = "7"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "August",
-                        Value = "8"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "September",
-                        Value = "9"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "October",
-                        Value = "10"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "November",
-                        Value = "11"
-                    });
-                    items.Add(new SelectListItem
-                    {
-                        Text = "December",
-                        Value = "12"
-                    });
-                    
-                }
-                <select asp-for="Month" class="form-control" asp-items="items"></select>
+                <select asp-for="Month" class ="form-control">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

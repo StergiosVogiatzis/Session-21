@@ -15,10 +15,10 @@ namespace PetShop.Web.Controllers
 {
     public class CustomersController : Controller
     {
-        private readonly PetShopContext _context;
-        private readonly IEntityRepo<Customer> _customerRepo;  
 
-        public CustomersController(IEntityRepo<Customer> customerRepo)
+        private readonly CustomerRepo _customerRepo;  
+
+        public CustomersController(CustomerRepo customerRepo)
         {
             _customerRepo = customerRepo;
         }
@@ -45,7 +45,12 @@ namespace PetShop.Web.Controllers
             if (ModelState.IsValid)
             {
                 var customer = new Customer { Name = customerView.Name, Surname = customerView.Surname, Phone = customerView.Phone, TIN = customerView.TIN };
-                await _customerRepo.AddAsync(customer);
+                if (await _customerRepo.TINExists(customer))
+                {
+                    ViewData["ErrorMessage"] = "Given TIN already exists!";
+                    return View(customerView);
+                }
+                await _customerRepo.AddAsync(customer); 
                 return RedirectToAction(nameof(Index));
             }
             return View(customerView);
@@ -65,6 +70,7 @@ namespace PetShop.Web.Controllers
                 return NotFound();
             }
             var customerView = new CustomerUpdateViewModel { Name = customer.Name, Surname = customer.Surname, TIN = customer.TIN, Phone = customer.Phone };
+
             return View(customerView);
         }
 
@@ -85,12 +91,28 @@ namespace PetShop.Web.Controllers
                 var currentCustomer = await _customerRepo.GetByIdAsync(id);
                 if (currentCustomer == null)
                     return BadRequest("Could not find Customer");
+
+                if (currentCustomer.TIN == customerView.TIN)
+                {
+                    currentCustomer.Name = customerView.Name;
+                    currentCustomer.Surname = customerView.Surname;
+                    currentCustomer.Phone = customerView.Phone;
+                    await _customerRepo.UpdateAsync(id, currentCustomer);
+                    return RedirectToAction(nameof(Index));
+                } 
+                
+                if (await _customerRepo.TINExists(currentCustomer))
+                {
+                    ViewData["ErrorMessage"] = "Given TIN already exists!";
+                    return View(customerView);
+                }
                 currentCustomer.Name = customerView.Name;
                 currentCustomer.Surname = customerView.Surname;
-                currentCustomer.TIN = customerView.TIN;
+                currentCustomer.TIN= customerView.TIN;
                 currentCustomer.Phone = customerView.Phone;
                 await _customerRepo.UpdateAsync(id, currentCustomer);
                 return RedirectToAction(nameof(Index));
+                
             }
 
             return View(customerView);
@@ -123,9 +145,5 @@ namespace PetShop.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CustomerExists(Guid id)
-        {
-            return _context.Customers.Any(e => e.ID == id);
-        }
     }
 }

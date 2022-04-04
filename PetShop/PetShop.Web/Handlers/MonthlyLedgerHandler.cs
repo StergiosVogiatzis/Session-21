@@ -8,30 +8,25 @@ namespace PetShop.Web.Handlers
     {
         private const int _RENT_COST = 2000;
         private readonly PetShopContext _context;
-        private readonly MonthlyLedger _monthlyLedger;
-
+        
         public MonthlyLedgerHandler(PetShopContext context)
-        {
+        { 
             _context = context;
+           
         }
 
-        public MonthlyLedgerHandler(PetShopContext context, MonthlyLedger monthlyLedger) : this(context)
+        public async Task<decimal> GetIncome(MonthlyLedger monthlyLedger)
         {
-            _monthlyLedger = monthlyLedger;
-        }
-
-        public async Task<decimal> GetIncome()
-        {
-            int year = Int32.Parse(_monthlyLedger.Year);
-            int month = Int32.Parse(_monthlyLedger.Month);
+            int year = int.Parse(monthlyLedger.Year);
+            int month = int.Parse(monthlyLedger.Month);
             var final=await _context.Transactions.Where(t => t.Date.Year == year && t.Date.Month == month).SumAsync(t => t.TotalPrice);
             return final;
         }
 
-        private async Task<decimal> GetPetAndPetFoodExpences()
+        private async Task<decimal> GetPetAndPetFoodExpences(MonthlyLedger monthlyLedger)
         {
-            decimal year = Decimal.Parse(_monthlyLedger.Year);
-            decimal month = Decimal.Parse(_monthlyLedger.Month);
+            int year = int.Parse(monthlyLedger.Year);
+            int month = int.Parse(monthlyLedger.Month);
             var monthlyTransactions = await _context.Transactions.Where(t => t.Date.Year == year && t.Date.Month == month).ToListAsync();
             decimal expences = 0;
             foreach (var t in monthlyTransactions)
@@ -49,9 +44,9 @@ namespace PetShop.Web.Handlers
             return final;
         }
 
-        public async Task<decimal> GetMonthlyExpenses()
+        public async Task<decimal> GetMonthlyExpenses(MonthlyLedger monthlyLedger)
         {
-            return await GetPetAndPetFoodExpences() +  await GetStuffExpences() + _RENT_COST; 
+            return await GetPetAndPetFoodExpences(monthlyLedger) +  await GetStuffExpences() + _RENT_COST; 
         }
 
         public decimal GetTotal(MonthlyLedger monthlyLedger)

@@ -36,6 +36,10 @@
             <input type="hidden" asp-for="ID" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                @if (ViewData["ErrorMessage"] is not null)
+                {
+                    <label class="text-danger">@ViewData["ErrorMessage"]</label>
+                }   
             </div>
         </form>
     </div>

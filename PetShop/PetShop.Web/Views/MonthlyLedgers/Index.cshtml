@@ -38,7 +38,7 @@
                  @Html.DisplayFor(modelItem => item.Year)
             </td>
             <td>
-               @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Int32.Parse(item.Month))
+               @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(int.Parse(item.Month))
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Income)

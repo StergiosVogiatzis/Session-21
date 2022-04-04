@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PetShopContext>();
-builder.Services.AddScoped<IEntityRepo<Customer>, CustomerRepo>();
+builder.Services.AddScoped<CustomerRepo>();
 builder.Services.AddScoped<IEntityRepo<Employee>, EmployeeRepo>();
 builder.Services.AddScoped<IEntityRepo<Pet>, PetRepo>();
 builder.Services.AddScoped<IEntityRepo<PetFood>, PetFoodRepo>();
@@ -16,6 +16,7 @@ builder.Services.AddScoped<IEntityRepo<Transaction>, TransactionRepo>();
 builder.Services.AddScoped<IEntityRepo<PetReport>, PetReportRepo>();
 builder.Services.AddScoped<PetReportHandler>();
 builder.Services.AddScoped<IEntityRepo<MonthlyLedger>, MonthlyLedgerRepo>();
+builder.Services.AddScoped<MonthlyLedgerHandler>();
 
 
 var app = builder.Build();

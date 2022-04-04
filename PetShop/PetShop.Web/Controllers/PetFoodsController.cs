@@ -15,7 +15,7 @@ namespace PetShop.Web.Controllers
 {
     public class PetFoodsController : Controller
     {
-        private readonly PetShopContext _context;
+        
         private readonly IEntityRepo<PetFood> _petFoodRepo;
 
 
@@ -136,11 +136,6 @@ namespace PetShop.Web.Controllers
             
             await _petFoodRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PetFoodExists(Guid id)
-        {
-            return _context.PetFoods.Any(e => e.ID == id);
         }
     }
 }

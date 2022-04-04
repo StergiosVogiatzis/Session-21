@@ -15,7 +15,6 @@ namespace PetShop.Web.Controllers
 {
     public class EmployeesController : Controller
     {
-        private readonly PetShopContext _context;
         private readonly IEntityRepo<Employee> _employeeRepo;
 
         public EmployeesController(IEntityRepo<Employee> employeeRepo)
@@ -121,9 +120,5 @@ namespace PetShop.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmployeeExists(Guid id)
-        {
-            return _context.Employees.Any(e => e.ID == id);
-        }
     }
 }
