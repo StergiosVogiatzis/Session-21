@@ -31,25 +31,6 @@ namespace PetShop.Web.Controllers
         {
             return View(await _logger.GetAllAsync());
         }
-
-        // GET: MonthlyLedgers/Details/5
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var monthlyLedger = await _context.MonthlyLedgers
-                .FirstOrDefaultAsync(m => m.Year == id);
-            if (monthlyLedger == null)
-            {
-                return NotFound();
-            }
-
-            return View(monthlyLedger);
-        }
-
         // GET: MonthlyLedgers/Create
         public IActionResult Create()
         {

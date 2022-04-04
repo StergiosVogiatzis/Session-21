@@ -36,29 +36,6 @@ namespace PetShop.Web.Controllers
                 .Include(t => t.PetFood);
             return View(await _transactionRepo.ToListAsync());
         }
-
-        // GET: Transactions/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var transaction = await _context.Transactions
-                .Include(t => t.Customer)
-                .Include(t => t.Employee)
-                .Include(t => t.Pet)
-                .Include(t => t.PetFood)
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            return View(transaction);
-        }
-
         // GET: Transactions/Create
         public IActionResult Create()
         {

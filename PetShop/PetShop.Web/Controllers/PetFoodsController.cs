@@ -30,24 +30,6 @@ namespace PetShop.Web.Controllers
             return View(await _petFoodRepo.GetAllAsync());
         }
 
-        // GET: PetFoods/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var petFood = await _context.PetFoods
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (petFood == null)
-            {
-                return NotFound();
-            }
-
-            return View(petFood);
-        }
-
         // GET: PetFoods/Create
         public IActionResult Create()
         {

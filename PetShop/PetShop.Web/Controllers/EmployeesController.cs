@@ -29,23 +29,6 @@ namespace PetShop.Web.Controllers
             return View(await _employeeRepo.GetAllAsync());
         }
 
-        // GET: Employees/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employee = await _employeeRepo.GetByIdAsync(id.Value);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-            var viewModel = new EmployeeViewModel { Name = employee.Name, Surname = employee.Surname, SallaryPerMonth = employee.SallaryPerMonth, EmployeeType = employee.EmployeeType };
-            return View(viewModel);
-        }
-
         // GET: Employees/Create
         public IActionResult Create()
         {

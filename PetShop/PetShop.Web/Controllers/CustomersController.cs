@@ -29,24 +29,6 @@ namespace PetShop.Web.Controllers
             return View(await _customerRepo.GetAllAsync());
         }
 
-        // GET: Customer/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customer = await _customerRepo.GetByIdAsync(id.Value);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            var viewModel = new CustomerViewModel { Name = customer.Name, Surname = customer.Surname, Phone = customer.Phone, TIN = customer.TIN };
-
-            return View(viewModel);
-        }
-
         // GET: Customer/Create
         public IActionResult Create()
         {
