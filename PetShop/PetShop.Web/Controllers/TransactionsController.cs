@@ -41,8 +41,8 @@ namespace PetShop.Web.Controllers
         {
             _transactionHandler=new TransactionHandler(_context);
             var transaction = _transactionHandler.GetAvailablePets();
-            ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "Name");
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "Name");
+            ViewData["CustomerID"] = new SelectList(_context.Customers, "ID", "FullName");
+            ViewData["EmployeeID"] = new SelectList(_context.Employees, "ID", "FullName");
             ViewData["PetID"] = new SelectList(transaction, "ID", "Breed");
             ViewData["PetFoodID"] = new SelectList(_context.PetFoods, "ID", "AnimalType");
             return View();
