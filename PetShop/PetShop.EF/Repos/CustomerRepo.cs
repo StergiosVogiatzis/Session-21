@@ -30,23 +30,24 @@ namespace PetShop.EF.Repos
 
         public async Task AddAsync(Customer entity)
         {
-            AddLogic(entity, context);
+            await AddLogic(entity);
             await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Guid id, Customer entity)
         {
-            UpdateLogic(id, entity, context);
-            await context.SaveChangesAsync();
+            if(await UpdateLogic(id, entity)){
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            DeleteLogic(id, context);
+            DeleteLogic(id);
             await context.SaveChangesAsync();
         }
 
-        private void DeleteLogic(Guid id, PetShopContext context)
+        private void DeleteLogic(Guid id)
         {
             var currentCustomer = context.Customers.SingleOrDefault(customer => customer.ID == id);
             if (currentCustomer is null)
@@ -55,23 +56,36 @@ namespace PetShop.EF.Repos
             context.Customers.Remove(currentCustomer);
         }
 
-        private void UpdateLogic(Guid id, Customer entity, PetShopContext context)
+        private async Task<bool> UpdateLogic(Guid id, Customer entity)
         {
             var currentCustomer = context.Customers.SingleOrDefault(customer => customer.ID == id);
             if (currentCustomer is null)
                 throw new KeyNotFoundException($"Given id '{id}' was not found in database");
-            currentCustomer.Name = entity.Name;
-            currentCustomer.Surname = entity.Surname;
-            currentCustomer.TIN = entity.TIN;
-            currentCustomer.Phone = entity.Phone;
+            if (!(await TINExists(entity)))
+            {
+                currentCustomer.Name = entity.Name;
+                currentCustomer.Surname = entity.Surname;
+                currentCustomer.TIN = entity.TIN;
+                currentCustomer.Phone = entity.Phone;
+                return true;
+            }
+            return false;
         }
 
-        private void AddLogic(Customer entity, PetShopContext context)
+        private async Task AddLogic(Customer entity)
         {
             if (entity.ID == Guid.Empty)
                 throw new ArgumentException("Given entity should not have Id set", nameof(entity));
+            if (!(await TINExists(entity)))
+            {
+                context.Customers.Add(entity);
+            }
+            
+        }
 
-            context.Customers.Add(entity);
+        private async Task<bool> TINExists(Customer entity)
+        {
+            return await context.Customers.SingleOrDefaultAsync(customer => customer.TIN == entity.TIN) is not null;
         }
     }
 }
